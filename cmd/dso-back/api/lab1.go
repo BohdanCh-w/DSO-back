@@ -30,7 +30,7 @@ func lab1_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 		}
 		analitics := analitic.Calculate()
 
-		fourier := usecases.FourierCalculator{
+		fourier := usecases.FourierFuncCalculator{
 			From:       req.From,
 			To:         req.To,
 			Iterations: req.Iterations,

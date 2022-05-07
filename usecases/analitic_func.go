@@ -10,13 +10,13 @@ type AnaliticCalculator struct {
 	PointNum int
 }
 
-func (calc AnaliticCalculator) Calculate() []entities.WawePoint {
+func (calc AnaliticCalculator) Calculate() []entities.WavePoint {
 	step := (calc.To - calc.From) / float64(calc.PointNum)
 
-	res := make([]entities.WawePoint, 0, calc.PointNum+1)
+	res := make([]entities.WavePoint, 0, calc.PointNum+1)
 
 	for i := calc.From; i <= calc.To; i += step {
-		point := entities.WawePoint{X: i, Y: ingergralFunc(i)}
+		point := entities.WavePoint{X: i, Y: ingergralFunc(i)}
 		res = append(res, point)
 	}
 

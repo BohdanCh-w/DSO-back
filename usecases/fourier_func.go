@@ -7,14 +7,14 @@ import (
 	"github.com/phil-mansfield/num"
 )
 
-type FourierCalculator struct {
+type FourierFuncCalculator struct {
 	From       float64
 	To         float64
 	Iterations int
 	PointNum   int
 }
 
-func (calc FourierCalculator) calcA(opts integralOpts) float64 {
+func (calc FourierFuncCalculator) calcA(opts integralOpts) float64 {
 	integration := func(x float64) float64 {
 		reminder := math.Remainder(x, math.Pi*2.0)
 
@@ -29,7 +29,7 @@ func (calc FourierCalculator) calcA(opts integralOpts) float64 {
 	return res / math.Pi
 }
 
-func (calc FourierCalculator) calcB(opts integralOpts) float64 {
+func (calc FourierFuncCalculator) calcB(opts integralOpts) float64 {
 	integration := func(x float64) float64 {
 		reminder := math.Remainder(x, math.Pi*2.0)
 
@@ -44,7 +44,7 @@ func (calc FourierCalculator) calcB(opts integralOpts) float64 {
 	return res / math.Pi
 }
 
-func (calc FourierCalculator) Calculate() entities.ResultAnalitics {
+func (calc FourierFuncCalculator) Calculate() entities.ResultAnalitics {
 	var (
 		step = (calc.To - calc.From) / float64(calc.PointNum)
 		sum  float64
@@ -54,7 +54,7 @@ func (calc FourierCalculator) Calculate() entities.ResultAnalitics {
 		analitics = entities.ResultAnalitics{
 			CoefsA: make([]float64, calc.Iterations),
 			CoefsB: make([]float64, calc.Iterations),
-			Points: make([]entities.WawePoint, 0, calc.PointNum+1),
+			Points: make([]entities.WavePoint, 0, calc.PointNum+1),
 		}
 	)
 
@@ -72,7 +72,7 @@ func (calc FourierCalculator) Calculate() entities.ResultAnalitics {
 			sum += analitics.CoefsA[i]*math.Cos(float64(i+1)*x) + analitics.CoefsB[i]*math.Sin(float64(i+1)*x)
 		}
 
-		analitics.Points = append(analitics.Points, entities.WawePoint{
+		analitics.Points = append(analitics.Points, entities.WavePoint{
 			X: x,
 			Y: a0/2 + sum,
 		})
