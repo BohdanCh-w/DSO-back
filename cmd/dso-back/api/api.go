@@ -18,7 +18,7 @@ type Options struct {
 func API(opts Options) http.Handler {
 	router := httprouter.New()
 
-	router.HandlerFunc(http.MethodGet, "/lab1/main", lab1_func1(opts.Logger, opts.AppConfig.SaveLocation))
+	router.HandlerFunc(http.MethodGet, "/lab1", lab1_func1(opts.Logger, opts.AppConfig.SaveLocation))
 
 	return router
 }
