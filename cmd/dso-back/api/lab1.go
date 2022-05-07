@@ -17,7 +17,7 @@ func lab1_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 
 		log.Println(r.Host, r.URL.String())
 
-		var req fourierRequest
+		var req fourierFuncRequest
 		if err := req.parse(r); err != nil {
 			web.Abort(w, web.NewError(http.StatusBadRequest, err))
 			return
@@ -63,14 +63,14 @@ type responsePoint struct {
 	Yf float64 `json:"yf"`
 }
 
-type fourierRequest struct {
+type fourierFuncRequest struct {
 	From       float64
 	To         float64
 	Iterations int
 	PointNum   int
 }
 
-func (req *fourierRequest) parse(r *http.Request) error {
+func (req *fourierFuncRequest) parse(r *http.Request) error {
 	query := r.URL.Query()
 	var err error
 
