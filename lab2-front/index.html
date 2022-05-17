@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Fourier</title>
+</head>
+
+<body>
+    <canvas id="chart"></canvas>
+    <div id='form'>
+        <div class="form-item-container">
+            <label class="form-item-label" for="from">Range: </label>
+            <input class="form-item" id="to" type="text" value="2pi" />
+            <input class="form-item" id="from" type="text" value="0" />
+        </div>
+
+        <div class="form-item-container">
+            <label class="form-item-label" for="iterations">Iterations: </label>
+            <input class="form-item" id="iterations" value="50" />
+        </div>
+
+        <div class="form-item-container">
+            <label class="form-item-label" for="dots">Points: </label>
+            <input class="form-item" id="dots" value="200" />
+        </div>
+
+        <div class="form-item-container form-container-points"></div>
+
+        <div class="button-wrapper">
+            <button class="form-item-container" id='add-point-button'>+</button>
+            <button class="form-item-container" id='remove-point-button'>-</button>
+            <button class="form-item-container" id='form-button'>Build!</button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>

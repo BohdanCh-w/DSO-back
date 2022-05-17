@@ -11,5 +11,5 @@ func CalcDifference(a, b []entities.WavePoint) (res float64) {
 		res += math.Abs(a[i].Y) - math.Abs(b[i].Y)
 	}
 
-	return
+	return res / float64(len(a))
 }

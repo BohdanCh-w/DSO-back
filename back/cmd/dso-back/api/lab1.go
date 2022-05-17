@@ -38,10 +38,10 @@ func lab1_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 		}
 		fouriers := fourier.Calculate()
 
-		response := make([]responsePoint, 0, len(analitics))
+		response := make([]responsePointDouble, 0, len(analitics))
 
 		for i := range analitics {
-			response = append(response, responsePoint{
+			response = append(response, responsePointDouble{
 				X:  analitics[i].X,
 				Y:  analitics[i].Y,
 				Yf: fouriers.Points[i].Y,
@@ -49,15 +49,15 @@ func lab1_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 		}
 
 		usecases.SaveResult(entities.SaveResult{
-			Diff:      usecases.CalcDifference(analitics, fouriers.Points),
-			Analitics: fouriers,
+			DiffMethodA:      usecases.CalcDifference(analitics, fouriers.Points),
+			AnaliticsMethodB: fouriers,
 		}, saveLocation)
 
 		web.Respond(w, http.StatusOK, response)
 	}
 }
 
-type responsePoint struct {
+type responsePointDouble struct {
 	X  float64 `json:"x"`
 	Y  float64 `json:"y"`
 	Yf float64 `json:"yf"`

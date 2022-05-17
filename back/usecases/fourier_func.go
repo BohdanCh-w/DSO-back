@@ -82,7 +82,14 @@ func (calc FourierFuncCalculator) Calculate() entities.ResultAnalitics {
 }
 
 func reminder(x float64, y float64) float64 {
-	return math.Remainder(x, y) + y/2.0
+	rem := math.Remainder(x, y)
+	if rem == 0 {
+		return 0
+	}
+	if rem < 0 {
+		return rem + y
+	}
+	return rem
 }
 
 type integralOpts struct {

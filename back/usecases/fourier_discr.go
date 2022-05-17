@@ -14,6 +14,8 @@ type FourierDiscreteCalculator struct {
 	points   []entities.WavePoint
 }
 
+const shift float64 = 0.206
+
 func (calc FourierDiscreteCalculator) calcA(index int) float64 {
 	var sum float64
 
@@ -21,7 +23,7 @@ func (calc FourierDiscreteCalculator) calcA(index int) float64 {
 		sum += p.Y * math.Cos(p.X*float64(index))
 	}
 
-	return sum
+	return sum * 2.0 / float64(len(calc.points))
 }
 
 func (calc FourierDiscreteCalculator) calcB(index int) float64 {
@@ -31,23 +33,27 @@ func (calc FourierDiscreteCalculator) calcB(index int) float64 {
 		sum += p.Y * math.Sin(p.X*float64(index))
 	}
 
-	return sum
+	return sum * 2.0 / float64(len(calc.points))
 }
 
-func (calc FourierDiscreteCalculator) calcPoints() {
+func (calc FourierDiscreteCalculator) calcPoints() []entities.WavePoint {
 	n := len(calc.Values)
 	step := 2 * math.Pi / float64(n)
 
-	calc.points = make([]entities.WavePoint, n)
+	points := make([]entities.WavePoint, n)
 	for i := 0; i < n; i++ {
-		calc.points[i] = entities.WavePoint{X: step * float64(i), Y: calc.Values[i]}
+		points[i] = entities.WavePoint{X: step * float64(i), Y: calc.Values[i]}
 	}
+
+	return points
 }
 
 func (calc FourierDiscreteCalculator) Calculate() entities.ResultAnalitics {
+	calc.points = calc.calcPoints()
+
 	var (
 		n    = len(calc.Values)
-		step = 2 * math.Pi / float64(n)
+		step = (calc.To - calc.From) / float64(calc.PointNum)
 		sum  float64
 		a0   = calc.calcA(0)
 
@@ -58,7 +64,7 @@ func (calc FourierDiscreteCalculator) Calculate() entities.ResultAnalitics {
 		}
 	)
 
-	for i := 0; i < n; i++ {
+	for i := 0; i < n-1; i++ {
 		analitics.CoefsA[i] = calc.calcA(i + 1)
 		analitics.CoefsB[i] = calc.calcB(i + 1)
 	}
@@ -66,8 +72,8 @@ func (calc FourierDiscreteCalculator) Calculate() entities.ResultAnalitics {
 	for x := calc.From; x <= calc.To; x += step {
 		sum = 0
 
-		for i := 0; i < n; i++ {
-			sum += analitics.CoefsA[i]*math.Cos(float64(i+1)*x) + analitics.CoefsB[i]*math.Sin(float64(i+1)*x)
+		for i := 0; i < n-1; i++ {
+			sum += analitics.CoefsA[i]*math.Cos(float64(i+1)*(x+shift)) + analitics.CoefsB[i]*math.Sin(float64(i+1)*(x+shift))
 		}
 
 		analitics.Points = append(analitics.Points, entities.WavePoint{

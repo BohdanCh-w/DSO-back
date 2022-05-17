@@ -7,6 +7,8 @@ type ResultAnalitics struct {
 }
 
 type SaveResult struct {
-	Diff      float64         `json:"diff"`
-	Analitics ResultAnalitics `json:"analitics"`
+	DiffMethodA      float64         `json:"diff_method_a,omitempty"`
+	DiffMethodB      float64         `json:"diff_method_b,omitempty"`
+	AnaliticsMethodA ResultAnalitics `json:"analitics_method_a,omitempty"`
+	AnaliticsMethodB ResultAnalitics `json:"analitics_method_b,omitempty"`
 }
