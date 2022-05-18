@@ -14,23 +14,24 @@ type SquareDiscreteCalculator struct {
 	PointNum int
 	Values   []float64
 	points   []entities.WavePoint
+	coefs    []float64
 }
 
-func (calc SquareDiscreteCalculator) calcPoints() []entities.WavePoint {
+func (calc *SquareDiscreteCalculator) calcPoints() []entities.WavePoint {
 	n := len(calc.Values)
 	step := 2 * math.Pi / float64(n)
 
 	points := make([]entities.WavePoint, n+1)
 	for i := 0; i < n; i++ {
-		points[i] = entities.WavePoint{X: step * float64(i), Y: calc.Values[i]}
+		points[i] = entities.WavePoint{X: step*float64(i) - math.Pi, Y: calc.Values[i]}
 	}
 
-	points[n] = entities.WavePoint{X: 2 * math.Pi, Y: calc.Values[0]}
+	points[n] = entities.WavePoint{X: math.Pi, Y: calc.Values[0]}
 
 	return points
 }
 
-func (calc SquareDiscreteCalculator) buildMatrix() [][]float64 {
+func (calc *SquareDiscreteCalculator) buildMatrix() [][]float64 {
 	var (
 		n        = 3
 		matrix   = make([][]float64, n)
@@ -66,7 +67,7 @@ func (calc SquareDiscreteCalculator) buildMatrix() [][]float64 {
 	return matrix
 }
 
-func (calc SquareDiscreteCalculator) Gaus(matrix [][]float64) bool {
+func (calc *SquareDiscreteCalculator) gaus(matrix [][]float64) bool {
 	var (
 		ok bool
 		n  = len(matrix)
@@ -74,7 +75,7 @@ func (calc SquareDiscreteCalculator) Gaus(matrix [][]float64) bool {
 
 	for i := 0; i < n; i++ {
 		if matrix[i][i] == 0 {
-			var c = 1
+			c := 1
 			for (i+c) < n && matrix[i+c][i] == 0 {
 				c++
 			}
@@ -103,15 +104,14 @@ func (calc SquareDiscreteCalculator) Gaus(matrix [][]float64) bool {
 	return ok
 }
 
-func (calc SquareDiscreteCalculator) checkConsistency(matrix [][]float64) int {
-	var n = len(matrix)
+func (calc *SquareDiscreteCalculator) checkConsistency(matrix [][]float64) int {
+	n := len(matrix)
 
 	for i := 0; i < n; i++ {
 		var sum float64
 		var j int
 		for j = 0; j < n; j++ {
 			sum += matrix[i][j]
-
 		}
 		if decimal.NewFromFloat(sum).Equal(decimal.NewFromFloat(matrix[i][j])) {
 			return 2
@@ -121,7 +121,7 @@ func (calc SquareDiscreteCalculator) checkConsistency(matrix [][]float64) int {
 	return 3
 }
 
-func (calc SquareDiscreteCalculator) calcCoef(matrix [][]float64, power int) ([]float64, error) {
+func (calc *SquareDiscreteCalculator) calcCoef(matrix [][]float64, power int) ([]float64, error) {
 	if power == 2 {
 		return nil, fmt.Errorf("Infinite Solutions possible")
 	}
@@ -138,10 +138,12 @@ func (calc SquareDiscreteCalculator) calcCoef(matrix [][]float64, power int) ([]
 		result[i] = matrix[i][n] / matrix[i][i]
 	}
 
+	calc.coefs = append(make([]float64, 0, len(result)), result...)
+
 	return result, nil
 }
 
-func (calc SquareDiscreteCalculator) Calculate() (entities.ResultAnalitics, error) {
+func (calc *SquareDiscreteCalculator) Calculate() (entities.ResultAnalitics, error) {
 	calc.points = calc.calcPoints()
 	var (
 		n    = len(calc.Values)
@@ -157,7 +159,7 @@ func (calc SquareDiscreteCalculator) Calculate() (entities.ResultAnalitics, erro
 	)
 
 	var power int
-	if ok := calc.Gaus(matrix); ok {
+	if ok := calc.gaus(matrix); ok {
 		power = calc.checkConsistency(matrix)
 	}
 
@@ -180,4 +182,8 @@ func (calc SquareDiscreteCalculator) Calculate() (entities.ResultAnalitics, erro
 	}
 
 	return analitics, nil
+}
+
+func (calc *SquareDiscreteCalculator) GetCoefs() []float64 {
+	return calc.coefs
 }

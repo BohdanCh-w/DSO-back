@@ -20,6 +20,7 @@ func API(opts Options) http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/lab1", lab1_func1(opts.Logger, opts.AppConfig.SaveLocation))
 	router.HandlerFunc(http.MethodGet, "/lab2", lab2_func1(opts.Logger, opts.AppConfig.SaveLocation))
+	router.HandlerFunc(http.MethodGet, "/lab3", lab3_func1(opts.Logger, opts.AppConfig.SaveLocation))
 
 	return router
 }

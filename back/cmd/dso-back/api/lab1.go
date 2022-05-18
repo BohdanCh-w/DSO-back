@@ -27,6 +27,7 @@ func lab1_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 			From:     req.From,
 			To:       req.To,
 			PointNum: req.PointNum,
+			Func:     usecases.IngergralFuncFanteak,
 		}
 		analitics := analitic.Calculate()
 
@@ -35,6 +36,7 @@ func lab1_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 			To:         req.To,
 			Iterations: req.Iterations,
 			PointNum:   req.PointNum,
+			Func:       usecases.IngergralFuncFanteak,
 		}
 		fouriers := fourier.Calculate()
 

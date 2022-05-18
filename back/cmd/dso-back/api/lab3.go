@@ -12,26 +12,17 @@ import (
 	"github.com/BohdanCh-w/DSO-back/usecases"
 )
 
-func lab2_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
+func lab3_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		web.EnableCors(&w)
 
 		log.Println(r.Host, r.URL.String())
 
-		var req discretePointsRequest
+		var req discretePointsRequestWithIter
 		if err := req.parse(r); err != nil {
 			web.Abort(w, web.NewError(http.StatusBadRequest, err))
 			return
 		}
-
-		fourierCalc := usecases.FourierDiscreteCalculator{
-			From:     req.From,
-			To:       req.To,
-			PointNum: req.PointNum,
-			Values:   req.Values,
-		}
-
-		fouriers := fourierCalc.Calculate()
 
 		geomCalc := usecases.GeometricDiscreteCalculator{
 			From:     req.From,
@@ -53,6 +44,22 @@ func lab2_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 		if err != nil {
 			log.Printf("Error calculating square: %v", err)
 		}
+
+		coefs := sqareCalc.GetCoefs()
+
+		fourierFunc := func(x float64) float64 {
+			return coefs[0] + coefs[1]*x + coefs[2]*x*x
+		}
+
+		fourierCalc := usecases.FourierFuncCalculator{
+			From:       req.From,
+			To:         req.To,
+			PointNum:   req.PointNum,
+			Iterations: req.Iterations,
+			Func:       fourierFunc,
+		}
+
+		fouriers := fourierCalc.Calculate()
 
 		response := make([]responsePointTriple, 0, len(fouriers.Points))
 
@@ -76,14 +83,15 @@ func lab2_func1(log *log.Logger, saveLocation string) http.HandlerFunc {
 	}
 }
 
-type discretePointsRequest struct {
-	From     float64
-	To       float64
-	PointNum int
-	Values   []float64
+type discretePointsRequestWithIter struct {
+	From       float64
+	To         float64
+	PointNum   int
+	Iterations int
+	Values     []float64
 }
 
-func (req *discretePointsRequest) parse(r *http.Request) error {
+func (req *discretePointsRequestWithIter) parse(r *http.Request) error {
 	query := r.URL.Query()
 	var err error
 
@@ -100,6 +108,11 @@ func (req *discretePointsRequest) parse(r *http.Request) error {
 	req.PointNum, err = strconv.Atoi(query.Get("dots"))
 	if err != nil {
 		return fmt.Errorf("Error reading dots parameter: %w", err)
+	}
+
+	req.Iterations, err = strconv.Atoi(query.Get("iterations"))
+	if err != nil {
+		return fmt.Errorf("Error reading iterations parameter: %w", err)
 	}
 
 	vals := strings.Split(query.Get("points"), ",")
@@ -122,11 +135,4 @@ func (req *discretePointsRequest) parse(r *http.Request) error {
 	}
 
 	return nil
-}
-
-type responsePointTriple struct {
-	X  float64 `json:"x"`
-	Y  float64 `json:"y"`
-	Yf float64 `json:"yf"`
-	Ys float64 `json:"ys"`
 }

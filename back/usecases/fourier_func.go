@@ -12,16 +12,12 @@ type FourierFuncCalculator struct {
 	To         float64
 	Iterations int
 	PointNum   int
+	Func       func(float64) float64
 }
 
-func (calc FourierFuncCalculator) calcA(opts integralOpts) float64 {
+func (calc *FourierFuncCalculator) calcA(opts integralOpts) float64 {
 	integration := func(x float64) float64 {
-		reminder := math.Remainder(x, math.Pi*2.0)
-
-		if reminder > 0 {
-			return 0
-		}
-		return math.Cos(float64(opts.iter) * x)
+		return calc.Func(x) * math.Cos(float64(opts.iter)*x)
 	}
 
 	res := num.Integral(integration, opts.from, 1, num.Linear, num.Flat)(opts.to)
@@ -29,14 +25,9 @@ func (calc FourierFuncCalculator) calcA(opts integralOpts) float64 {
 	return res / math.Pi
 }
 
-func (calc FourierFuncCalculator) calcB(opts integralOpts) float64 {
+func (calc *FourierFuncCalculator) calcB(opts integralOpts) float64 {
 	integration := func(x float64) float64 {
-		reminder := math.Remainder(x, math.Pi*2.0)
-
-		if reminder > 0 {
-			return 0
-		}
-		return math.Sin(float64(opts.iter) * x)
+		return calc.Func(x) * math.Sin(float64(opts.iter)*x)
 	}
 
 	res := num.Integral(integration, opts.from, 1, num.Linear, num.Flat)(opts.to)
@@ -44,12 +35,12 @@ func (calc FourierFuncCalculator) calcB(opts integralOpts) float64 {
 	return res / math.Pi
 }
 
-func (calc FourierFuncCalculator) Calculate() entities.ResultAnalitics {
+func (calc *FourierFuncCalculator) Calculate() entities.ResultAnalitics {
 	var (
 		step = (calc.To - calc.From) / float64(calc.PointNum)
 		sum  float64
-		a0   = calc.calcA(integralOpts{to: 2 * math.Pi})
-		opts = integralOpts{from: 0, to: 2 * math.Pi}
+		opts = integralOpts{from: -math.Pi, to: math.Pi}
+		a0   = calc.calcA(opts)
 
 		analitics = entities.ResultAnalitics{
 			CoefsA: make([]float64, calc.Iterations),
